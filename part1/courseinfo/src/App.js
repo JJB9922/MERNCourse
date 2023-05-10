@@ -1,5 +1,7 @@
+import { useState } from "react"
+
 const Header = (props) => {
-  
+  console.log(props)
   return(
     <div>
       <h1>{props.course}</h1>
@@ -8,6 +10,7 @@ const Header = (props) => {
 }
 
 const Part = (props) => {
+  console.log(props)
   return(
     <p>{props.part} {props.exercises}</p>
   )
@@ -42,6 +45,10 @@ const Total = (props) => {
   
 }
 
+const Counter = () => {
+  
+}
+
 const App = () => {
   const course = {
   name: 'Half Stack application development',
@@ -60,12 +67,18 @@ const App = () => {
 ]
 
   }
+  const [counter, setCounter] = useState(0)
+
+  setTimeout(() => setCounter(counter+1), 1000)
+  console.log('rendering... ', counter)
+
   return(
  
     <div>
       <Header course={course.name} />
       <Content parts={course.parts}/>
       <Total parts={course.parts}/>
+      <div>{counter}</div>
     </div>
   )
 }
