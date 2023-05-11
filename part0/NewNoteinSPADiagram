@@ -33,4 +33,4 @@ sequenceDiagram
     deactivate server
 
     Note over browser: New note is rendered to screen
-```mermaid
+```
