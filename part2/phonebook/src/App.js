@@ -2,27 +2,31 @@ import { useState, useEffect } from 'react'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import FilteredDisplay from './components/FilteredDisplay'
-import axios from 'axios'
+import peopleService from './services/people'
+import notifications from './components/Notification'
+
 
 const App = () => {
   //State handlers
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchVal, setSearchVal] = useState('')
 
   //Fetch data from database
-  const getHook = () => {
+  useEffect(() => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-        .then(response => {
+    peopleService
+        .getAll()
+          .then((initialPersons) => {
           console.log('promise fulfilled')
-          setPersons(response.data)
+          setPersons(initialPersons)
+          
         },)
-  }
+  }, [])
 
-  useEffect(getHook, [])
   console.log("There are ", persons.length, " people")
 
   //Event handlers
@@ -42,32 +46,78 @@ const App = () => {
   }
 
   const addPerson = (event) =>{
+    console.log("addEvent: ", event.target)
     event.preventDefault()
     const personObject = {
       name: newName,
       number: newNumber,
       id: persons.length + 1,
     }
+    const changedNumber = {...personObject, number: newNumber}
     
     const nameTest = nameArray.find(name => name === newName)
     console.log("Test: ", nameTest)
     if(!nameTest){
-      setPersons(persons.concat(personObject))
-      console.log(persons)
-      setNewName('')
-      setNewNumber('')
-      console.log("Button Clicked: ", event.target)
+    peopleService  
+    .create(personObject)
+      .then(person => {
+        setPersons(persons.concat(person))
+        console.log(persons)
+        console.log("Button Clicked: ", event.target)
+          setSuccessMessage(`Added ${newName}`)
+            setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
+
+        setNewName('')
+        setNewNumber('')
+    })
+    
     } else {
-      alert(`${newName} is already added to phonebook`);
-      setNewName('')
-      setNewNumber('')
+      if(window.confirm(`${newName} is already added to phonebook, replace the old number with the new one?`)){
+        console.log("addPerson ID: ", persons.find(i => i.name === newName))
+        const personToUpdate = persons.find(i => i.name === newName)
+
+        peopleService.update(personToUpdate.id, changedNumber)
+          .then(returnedPerson => {
+            console.log(`${newName} has been updated with the new number`)
+            console.log(`Chained then: ${returnedPerson}`)
+            setPersons(persons.map(p => p.id !== personToUpdate.id ? p : returnedPerson))
+          }).catch(error => {
+            setPersons(persons.filter(p => p.id !== personToUpdate.id))
+            setErrorMessage(`Information of ${newName} has already been removed from the server`)
+          })
+
+        setNewName('')
+        setNewNumber('')
+      }
+      
     }
       
   }
 
+  const handleDelClick = (event) => {
+    console.log(event.target.value)
+    console.log("People to show: ", peopleToShow)
+    const chosenPerson = peopleToShow.find(i => i.id == event.target.value)
+    console.log("Chosen person = ", {chosenPerson})
+
+    if (window.confirm(`Delete ${chosenPerson.name}?`)) {
+      peopleService.remove(event.target.value).then(() => {
+        console.log(`Deleted person with id ${event.target.value}`)
+        console.log("PMap: ", persons.filter(i => i.id !== chosenPerson.id))
+        setPersons(persons.filter(i => i.id !== chosenPerson.id))
+        })
+    } else {
+      console.log(`${chosenPerson} not deleted.`)
+
+    }
+    
+  }
+
   //Creating additional arrays
-  const peopleToShow = persons.filter(persons => persons.name.toLowerCase().includes(searchVal.toLowerCase()))
-  const nameArray = persons.map(persons => persons.name)
+  const peopleToShow = persons.filter(p => p.name.toLowerCase().includes(searchVal.toLowerCase()))
+  const nameArray = persons.map(p => p.name)
   
   return (
     <div>
@@ -77,11 +127,12 @@ const App = () => {
 
       <h2>Add a new contact</h2>
 
+      <notifications.SuccessMsg message={successMessage}/>
       <PersonForm addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
       
       <h2>Numbers</h2>
-
-      <FilteredDisplay peopleToShow={peopleToShow}/>
+      <notifications.ErrorMsg message={errorMessage}/>
+      <FilteredDisplay key={peopleToShow.id} peopleToShow={peopleToShow} handleDelClick={handleDelClick}/>
 
     </div>
   )
