@@ -17,7 +17,7 @@ const CountryDisplay = ({countriesToShow}) => {
     console.log("langList: ", languageVals)
 
     const api_key = process.env.REACT_APP_API_KEY
-    const baseURL = `http://api.openweathermap.org/data/2.5/weather?q=${countriesToShow.capital}&appid=${api_key}`
+    const baseURL = `http://api.openweathermap.org/data/2.5/weather?q=${countriesToShow.capital}&appid=${api_key}&units=metric`
     axios.get(baseURL).then((response) => response.data).then((r) => {
         console.log("RMainTemp: ", r)
         setTempState(r.main.temp)
