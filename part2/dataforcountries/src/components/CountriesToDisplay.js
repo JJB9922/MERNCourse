@@ -2,6 +2,8 @@ import React from 'react'
 import axios from 'axios'
 import { useState } from 'react'
 
+
+
 const CountriesDisplay = ({countriesToShow, quickView}) => {
     return(
         <div>{countriesToShow.name.common} <button value={countriesToShow.ccn3} onClick={quickView}> Show </button></div>
