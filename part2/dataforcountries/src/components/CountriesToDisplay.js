@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import { useState } from 'react'
 
-api_key = db8023da8b6aafe3e064d8f37c59f41e
+const api_key = db8023da8b6aafe3e064d8f37c59f41e
 
 const CountriesDisplay = ({countriesToShow, quickView}) => {
     return(
