@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import { useState } from 'react'
 
-let api_key = 'db8023da8b6aafe3e064d8f37c59f41e'
+
 
 const CountriesDisplay = ({countriesToShow, quickView}) => {
     return(
@@ -18,7 +18,8 @@ const CountryDisplay = ({countriesToShow}) => {
     const languageVals = Object.values(countriesToShow.languages).map(c=><li>{c}</li>)
     console.log("langList: ", languageVals)
 
-    const api_key = process.env.REACT_APP_API_KEY
+   //const api_key = process.env.REACT_APP_API_KEY
+    const api_key = 'db8023da8b6aafe3e064d8f37c59f41e'
     const baseURL = `http://api.openweathermap.org/data/2.5/weather?q=${countriesToShow.capital}&appid=${api_key}&units=metric`
     axios.get(baseURL).then((response) => response.data).then((r) => {
         console.log("RMainTemp: ", r)
