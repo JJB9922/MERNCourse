@@ -57,7 +57,7 @@ export default function CountriesToDisplay({countriesToShow, quickView}) {
 if(countriesToShow.length === 250){
 return(<div></div>) 
 } else {
-    if(countriesToShow.length < 11 && countriesToShow.length > 2){
+    if(countriesToShow.length < 11 && countriesToShow.length > 1){
         return (
             <div>{countriesToShow.map(countriesToShow => <CountriesDisplay key={countriesToShow.ccn3} countriesToShow={countriesToShow} quickView={quickView}/>)}
             {console.log("D CTS: ", countriesToShow)}</div>
